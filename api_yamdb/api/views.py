@@ -24,4 +24,13 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     # permission_classes =
-    pass
+
+    def get_queryset(self):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, pk=review_id)
+        return review.comments.all()
+
+    def perform_create(self, serializer):
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(Review, pk=review_id)
+        serializer.save(authot=self.request.user, review=review)

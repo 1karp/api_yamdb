@@ -118,7 +118,8 @@ class Comment(models.Model):
     )
     text = models.TextField(verbose_name='Текст')
     author = models.ForeignKey(
-        'User', on_delete=models.CASCADE,
+        'User',
+        on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор'
     )
@@ -133,4 +134,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
-
