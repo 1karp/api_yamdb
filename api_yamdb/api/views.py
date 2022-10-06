@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from reviews.models import Review, Comment, Title
 from .serializers import ReviewSerializer, CommentSerializer
 from rest_framework import filters, status, viewsets
+from .permissions import IsAuthorOrReadOnly
 
 
 # Create your views here.
@@ -9,7 +10,8 @@ from rest_framework import filters, status, viewsets
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
 
-    # permission_classes =
+    permission_classes = IsAuthorOrReadOnly
+
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, id=title_id)
@@ -23,7 +25,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    # permission_classes =
+    permission_classes = IsAuthorOrReadOnly
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
