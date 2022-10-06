@@ -76,7 +76,7 @@ class Review(models.Model):
         'Title',
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='Произведение'
+        verbose_name='Произведение',
     )
     text = models.TextField(
         blank=False,
@@ -87,14 +87,14 @@ class Review(models.Model):
         'User',
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='Автор отзыва'
+        verbose_name='Автор отзыва',
     )
     score = models.IntegerField(
         validators=[
             MinValueValidator(1),
             MaxValueValidator(10)
         ],
-        verbose_name='Рейтинг отзыва'
+        verbose_name='Рейтинг отзыва',
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -122,7 +122,7 @@ class Comment(models.Model):
         'Review',
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Отзыв'
+        verbose_name='Отзыв',
     )
     text = models.TextField(
         blank=False,
@@ -147,7 +147,6 @@ class Comment(models.Model):
 
     class Meta:
         verbose_name = 'Комментарий'
-        verbose_name_plural = 'Комментарии'
 
     def __str__(self):
         return self.text[:15]
