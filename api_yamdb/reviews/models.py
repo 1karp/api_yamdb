@@ -78,54 +78,71 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='Произведение'
     )
-    text = models.TextField()
+    text = models.TextField(
+        blank=False,
+        null=False,
+        verbose_name='Текст отзыва',
+    )
     author = models.ForeignKey(
         'User',
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='Автор'
+        verbose_name='Автор отзыва'
     )
     score = models.IntegerField(
         validators=[
             MinValueValidator(1),
             MaxValueValidator(10)
         ],
-        verbose_name='Рейтинг'
+        verbose_name='Рейтинг отзыва'
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Дата публикации'
+        verbose_name='Дата публикации отзыва',
+        blank=False,
+        null=False,
+        db_index=True,
     )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=['author', 'title'],
-                name='unique review')
+                name='unique_review')
         ]
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
 
     def __str__(self):
-        return self.text
+        return self.text[:15]
 
 
 class Comment(models.Model):
     review = models.ForeignKey(
-        'Review', on_delete=models.CASCADE,
+        'Review',
+        on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Отзыв'
     )
-    text = models.TextField(verbose_name='Текст')
+    text = models.TextField(
+        blank=False,
+        null=False,
+        verbose_name='Текст комментария',
+    )
     author = models.ForeignKey(
         'User',
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Автор'
+        verbose_name='Автор комментария',
+        blank=False,
+        null=False,
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Дата публикации'
+        verbose_name='Дата публикации комментария',
+        blank=False,
+        null=False,
+        db_index=True,
     )
 
     class Meta:
@@ -133,4 +150,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text
+        return self.text[:15]
