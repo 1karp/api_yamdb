@@ -24,6 +24,10 @@ class Command(BaseCommand):
                 f'{settings.BASE_DIR}/static/data/{file}',
                 'r', encoding='utf-8'
             ) as csv_file:
-                reader = csv.reader(csv_file)
-                model.objects.bulk_create(model(**data) for data in reader)
+                try:
+                    reader = csv.DictReader(csv_file)
+                    model.objects.bulk_create(model(**data) for data in reader)
+                except Exception as err:
+                    self.stderr.write(f'Error in importing data: {err}')
+                    CommandError(err)
         self.stdout.write(self.style.SUCCESS('Data loaded successfully'))
