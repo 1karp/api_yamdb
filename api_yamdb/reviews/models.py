@@ -1,12 +1,12 @@
-from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
-
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
 TITLE_NAME_LENGTH = 200
 TITLE_DESCRIPTION_LENGTH = 225
 CATEGORY_NAME_LENGTH = 256
 CATEGORY_SLUG_LENGTH = 50
+
 
 class User(AbstractUser):
     """модель пользователя
@@ -21,18 +21,18 @@ class User(AbstractUser):
     ]
 
     email = models.EmailField(
-        verbose_name = 'Адрес электронной почты',
-        unique = True
+        verbose_name='Адрес электронной почты',
+        unique=True
     )
 
     username = models.CharField(
-        verbose_name = 'Имя пользователя',
+        verbose_name='Имя пользователя',
         max_length=150,
         null=True,
         unique=True
     )
     role = models.CharField(
-        verbose_name ='Роль',
+        verbose_name='Роль',
         max_length=50,
         choices=ROLES,
         default=USER
@@ -42,7 +42,7 @@ class User(AbstractUser):
         null=True,
         blank=True
     )
-    
+
     @property
     def is_moder(self):
         """Возвращает роль пользователя: Модератор

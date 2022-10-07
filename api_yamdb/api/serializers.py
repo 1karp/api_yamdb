@@ -1,8 +1,8 @@
-from django.utils import timezone
 from django.core.validators import MaxValueValidator, UniqueValidator
+from django.utils import timezone
 from rest_framework import serializers
 
-from reviews.models import Category, Genre, Title, Comment, Review, User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,12 +41,12 @@ class RegisterSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации.
     """
     username = serializers.CharField(
-        validators = [
+        validators=[
             UniqueValidator(queryset=User.objects.all())
         ]
     )
     email = serializers.EmailField(
-        validators = [
+        validators=[
             UniqueValidator(queryset=User.objects.all())
         ]
     )
@@ -68,7 +68,7 @@ class TokenSerializer(serializers.Serializer):
     """
     username = serializers.CharField()
     confirmation_code = serializers.CharField()
-    
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

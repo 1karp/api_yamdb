@@ -1,16 +1,17 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from django.shortcuts import render, get_object_or_404
-
-from rest_framework import permissions, status, viewsets, filters
+from django.shortcuts import get_object_or_404, render
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import User, Review, Comment, Title
+from reviews.models import Comment, Review, Title, User
 from .permissions import IsAdmin, IsAuthorOrReadOnly
-from .serializers import UserSerializer, UserEditSerializer, TokenSerializer, RegisterSerializer, ReviewSerializer, CommentSerializer
+from .serializers import (CommentSerializer, RegisterSerializer,
+                          ReviewSerializer, TokenSerializer,
+                          UserEditSerializer, UserSerializer)
 
 
 @api_view(['POST'])
@@ -52,7 +53,7 @@ def get_token(request):
         user, serializer.validated_data['confirmation_code']
     ):
         token = AccessToken.for_user(user)
-        return Response({'token' : str(token)}, status=status.HTTP_200_OK)
+        return Response({'token': str(token)}, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
@@ -71,12 +72,11 @@ class UserViewSet(viewsets.ModelViewSet):
             'get',
             'patch',
         ],
-            detail=False,
-            url_path='me',
-            permission_classes=[permissions.IsAuthenticated],
-            serializer_class=UserEditSerializer,
+        detail=False,
+        url_path='me',
+        permission_classes=[permissions.IsAuthenticated],
+        serializer_class=UserEditSerializer,
     )
-
     def users_profile(self, request):
         user = request.user
         if request.method == 'GET':
