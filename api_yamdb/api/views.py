@@ -154,9 +154,8 @@ class CategoryViewSet(CreateModelMixin, ListModelMixin,
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     permission_classes = (IsAdminOrReadonly,)
-    filter_backends = (DjangoFilterBackend, filters.OrderingFilter)
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    ordering_fields = ('name',)
     pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
