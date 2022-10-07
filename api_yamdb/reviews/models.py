@@ -69,6 +69,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=CATEGORY_SLUG_LENGTH, unique=True)
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Категория'
 
     def __str__(self):
@@ -80,6 +81,7 @@ class Genre(models.Model):
     slug = models.SlugField(max_length=CATEGORY_SLUG_LENGTH, unique=True)
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Жанр'
 
     def __str__(self):
@@ -110,6 +112,7 @@ class Title(models.Model):
     )
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Произведение'
 
     def __str__(self):
