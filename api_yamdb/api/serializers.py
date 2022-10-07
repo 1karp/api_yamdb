@@ -1,26 +1,90 @@
-from django.utils import timezone
 from django.core.validators import MaxValueValidator
+from django.utils import timezone
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
-from reviews.models import Category, Genre, Title, Comment, Review
+from reviews.models import Category, Comment, Genre, Review, Title, User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор для User.
+    """
+    username = serializers.CharField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ],
+        required=True,
+
+    )
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ]
+    )
+
+    class Meta:
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
+        model = User
+
+
+class UserEditSerializer(serializers.ModelSerializer):
+    """Сериализатор для редактирования профиля.
+    """
+    class Meta:
+        fields = ('username', 'email', 'first_name',
+                  'last_name', 'bio', 'role')
+        model = User
+        read_only_fields = ('role',)
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    """Сериализатор для регистрации.
+    """
+    username = serializers.CharField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ]
+    )
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ]
+    )
+
+    def validate_username(self, value):
+        """ Username 'me' запрещен по ТЗ.
+        """
+        if value.lower() == 'me':
+            raise serializers.ValidationError("Username 'me' is not valid")
+        return value
+
+    class Meta:
+        fields = ('username', 'email')
+        model = User
+
+
+class TokenSerializer(serializers.Serializer):
+    """Сериализатор для Токена.
+    """
+    username = serializers.CharField()
+    confirmation_code = serializers.CharField()
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
         exclude = ('id',)
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = '__all__'
         exclude = ('id',)
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
-    rating = serializers.IntegerField(default=0)
+    rating = serializers.IntegerField(default=None)
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
 
@@ -50,6 +114,7 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """Серилизатор для комментариев под обзором"""
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
@@ -62,19 +127,22 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    """Серилизатор обзоров"""
     author = serializers.SlugRelatedField(
         slug_field='username',
         read_only=True,
         default=serializers.CurrentUserDefault(),
     )
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        fields = ('id', 'text', 'author', 'score', 'pub_date', 'rating')
 
     def validate(self, data):
-        if self.context['request'] != 'POST':
+        if self.context['request'].method != 'POST':
             return data
+
         title_id = self.context['view'].kwargs.get('title_id')
         author = self.context['request'].user
         if Review.objects.filter(
