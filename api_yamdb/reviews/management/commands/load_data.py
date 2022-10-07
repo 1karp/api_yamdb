@@ -13,6 +13,18 @@ TABLES_2_FILES_DICT = {
     Comment: 'comments.csv',
     GenreTitle: 'genre_title.csv'
 }
+FOREIGN_KEYS = ('category', 'author')
+
+
+def csv_handler(csv_data, model):
+    objs = []
+    for row in csv_data:
+        for field in FOREIGN_KEYS:
+            if field in row:
+                row[f'{field}_id'] = row[field]
+                del row[field]
+        objs.append(model(**row))
+    model.objects.bulk_create(objs)
 
 
 class Command(BaseCommand):
@@ -21,12 +33,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for model, file in TABLES_2_FILES_DICT.items():
             with open(
-                f'{settings.BASE_DIR}/static/data/{file}',
-                'r', encoding='utf-8'
+                    f'{settings.BASE_DIR}/static/data/{file}',
+                    'r', encoding='utf-8'
             ) as csv_file:
                 try:
-                    reader = csv.DictReader(csv_file)
-                    model.objects.bulk_create(model(**data) for data in reader)
+                    csv_handler(csv.DictReader(csv_file), model)
                 except Exception as err:
                     self.stderr.write(f'Error in importing data: {err}')
                     CommandError(err)
