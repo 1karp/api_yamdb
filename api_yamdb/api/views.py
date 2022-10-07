@@ -3,21 +3,21 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, render
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
                                    ListModelMixin)
-from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Comment, Review, Title, User, Genre, Category
+from reviews.models import Category, Comment, Genre, Review, Title, User
 from .filters import TitleFilter
-from .permissions import IsAdmin, IsAuthorOrReadOnly, IsAdminOrReadonly
+from .permissions import IsAdmin, IsAdminOrReadonly, IsAuthorOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
-                          RegisterSerializer, GenreSerializer,
-                          ReviewSerializer, TokenSerializer,
-                          UserEditSerializer, UserSerializer,
-                          TitleGetSerializer, TitlePostSerializer)
+                          GenreSerializer, RegisterSerializer,
+                          ReviewSerializer, TitleGetSerializer,
+                          TitlePostSerializer, TokenSerializer,
+                          UserEditSerializer, UserSerializer)
 
 
 @api_view(['POST'])
