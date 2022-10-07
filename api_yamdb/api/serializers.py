@@ -74,19 +74,17 @@ class TokenSerializer(serializers.Serializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = '__all__'
         exclude = ('id',)
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        fields = '__all__'
         exclude = ('id',)
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
-    rating = serializers.IntegerField(default=0)
+    rating = serializers.IntegerField(default=None)
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
 

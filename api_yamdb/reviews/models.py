@@ -88,7 +88,7 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=TITLE_NAME_LENGTH)
-    year = models.IntegerField(unique=True)
+    year = models.IntegerField()
     description = models.TextField(
         max_length=TITLE_DESCRIPTION_LENGTH,
         null=True,
