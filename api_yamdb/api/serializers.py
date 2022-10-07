@@ -35,7 +35,7 @@ class UserEditSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
         model = User
-        read_only_fields = ('role')
+        read_only_fields = ('role',)
 
 
 class RegisterSerializer(serializers.ModelSerializer):
