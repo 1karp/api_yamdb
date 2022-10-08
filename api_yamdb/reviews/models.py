@@ -6,6 +6,7 @@ TITLE_NAME_LENGTH = 200
 TITLE_DESCRIPTION_LENGTH = 225
 CATEGORY_NAME_LENGTH = 256
 CATEGORY_SLUG_LENGTH = 50
+RETURN_STRING_LENGTH = 15
 
 
 class User(AbstractUser):
@@ -28,7 +29,6 @@ class User(AbstractUser):
     username = models.CharField(
         verbose_name='Имя пользователя',
         max_length=150,
-        null=True,
         unique=True
     )
     role = models.CharField(
@@ -175,7 +175,7 @@ class Review(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:RETURN_STRING_LENGTH]
 
 
 class Comment(models.Model):
@@ -211,4 +211,4 @@ class Comment(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:RETURN_STRING_LENGTH]

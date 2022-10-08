@@ -1,4 +1,4 @@
-from django.core.validators import MaxValueValidator
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -94,9 +94,15 @@ class TitleGetSerializer(serializers.ModelSerializer):
         read_only_fields = ('__all__',)
 
 
+def year_validator(value):
+    if value > timezone.now().year:
+        raise ValidationError(
+            f'Некорректное значение для поля year: {value}!')
+
+
 class TitlePostSerializer(serializers.ModelSerializer):
     year = serializers.IntegerField(
-        validators=[MaxValueValidator(timezone.now().year)],
+        validators=(year_validator,)
     )
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(),
