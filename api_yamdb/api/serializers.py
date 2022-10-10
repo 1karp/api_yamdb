@@ -1,9 +1,8 @@
-from django.core.exceptions import ValidationError
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
+from .validators import year_validator
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,17 +40,6 @@ class UserEditSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации.
     """
-    username = serializers.CharField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ]
-    )
-    email = serializers.EmailField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ]
-    )
-
     def validate_username(self, value):
         """ Username 'me' запрещен по ТЗ.
         """
@@ -92,13 +80,6 @@ class TitleGetSerializer(serializers.ModelSerializer):
         model = Title
         fields = '__all__'
         read_only_fields = ('__all__',)
-
-
-def year_validator(value):
-    if value > timezone.now().year:
-        raise ValidationError(
-            f'Некорректное значение для поля year: {value}!'
-        )
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
