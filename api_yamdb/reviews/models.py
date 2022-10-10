@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from .validators import validate_username, year_validator
+
 TITLE_NAME_LENGTH = 200
 TITLE_DESCRIPTION_LENGTH = 225
 CATEGORY_NAME_LENGTH = 256
@@ -29,7 +31,10 @@ class User(AbstractUser):
     username = models.CharField(
         verbose_name='Имя пользователя',
         max_length=150,
-        unique=True
+        unique=True,
+        validators=[
+            validate_username
+        ],
     )
     role = models.CharField(
         verbose_name='Роль',
@@ -90,7 +95,11 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=TITLE_NAME_LENGTH)
-    year = models.IntegerField()
+    year = models.IntegerField(
+        validators=[
+            year_validator
+        ],
+    )
     description = models.TextField(
         max_length=TITLE_DESCRIPTION_LENGTH,
         null=True,

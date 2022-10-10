@@ -30,7 +30,6 @@ def register(request):
     """
     serializer = RegisterSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    serializer.save()
     try:
         user, _ = User.objects.get_or_create(**serializer.validated_data)
     except IntegrityError:
