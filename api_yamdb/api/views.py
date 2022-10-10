@@ -10,6 +10,7 @@ from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
                                    ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 from rest_framework_simplejwt.tokens import AccessToken
 
 from reviews.models import Category, Genre, Review, Title, User
@@ -33,9 +34,7 @@ def register(request):
     try:
         user, _ = User.objects.get_or_create(**serializer.validated_data)
     except IntegrityError:
-        raise IntegrityError(
-            'Пользователь с таким username или email уже существует'
-        )
+        raise ValidationError
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         subject='Registration',
