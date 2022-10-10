@@ -1,6 +1,8 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.validators import validate_username
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,12 +24,22 @@ class UserEditSerializer(serializers.ModelSerializer):
         read_only_fields = ('role',)
 
 
-class RegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.Serializer):
     """Сериализатор для регистрации.
     """
-    class Meta:
-        fields = ('username', 'email')
-        model = User
+    username = serializers.CharField(
+        validators=[
+            validate_username,
+            UniqueValidator(queryset=User.objects.all())
+        ],
+        required=True
+    )
+    email = serializers.EmailField(
+        validators=[
+            UniqueValidator(queryset=User.objects.all())
+        ],
+        required=True
+    )
 
 
 class TokenSerializer(serializers.Serializer):
