@@ -2,10 +2,13 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from .validators import validate_username, year_validator
+
 TITLE_NAME_LENGTH = 200
 TITLE_DESCRIPTION_LENGTH = 225
 CATEGORY_NAME_LENGTH = 256
 CATEGORY_SLUG_LENGTH = 50
+RETURN_STRING_LENGTH = 15
 
 
 class User(AbstractUser):
@@ -28,8 +31,10 @@ class User(AbstractUser):
     username = models.CharField(
         verbose_name='Имя пользователя',
         max_length=150,
-        null=True,
-        unique=True
+        unique=True,
+        validators=[
+            validate_username
+        ],
     )
     role = models.CharField(
         verbose_name='Роль',
@@ -90,7 +95,11 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=TITLE_NAME_LENGTH)
-    year = models.IntegerField()
+    year = models.IntegerField(
+        validators=[
+            year_validator
+        ],
+    )
     description = models.TextField(
         max_length=TITLE_DESCRIPTION_LENGTH,
         null=True,
@@ -175,7 +184,7 @@ class Review(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:RETURN_STRING_LENGTH]
 
 
 class Comment(models.Model):
@@ -211,4 +220,4 @@ class Comment(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:RETURN_STRING_LENGTH]

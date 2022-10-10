@@ -1,27 +1,13 @@
-from django.core.validators import MaxValueValidator
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.validators import validate_username
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор для User.
     """
-    username = serializers.CharField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ],
-        required=True,
-
-    )
-    email = serializers.EmailField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ]
-    )
-
     class Meta:
         fields = ('username', 'email', 'first_name',
                   'last_name', 'bio', 'role')
@@ -38,37 +24,29 @@ class UserEditSerializer(serializers.ModelSerializer):
         read_only_fields = ('role',)
 
 
-class RegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.Serializer):
     """Сериализатор для регистрации.
     """
     username = serializers.CharField(
         validators=[
+            validate_username,
             UniqueValidator(queryset=User.objects.all())
-        ]
+        ],
+        required=True
     )
     email = serializers.EmailField(
         validators=[
             UniqueValidator(queryset=User.objects.all())
-        ]
+        ],
+        required=True
     )
-
-    def validate_username(self, value):
-        """ Username 'me' запрещен по ТЗ.
-        """
-        if value.lower() == 'me':
-            raise serializers.ValidationError("Username 'me' is not valid")
-        return value
-
-    class Meta:
-        fields = ('username', 'email')
-        model = User
 
 
 class TokenSerializer(serializers.Serializer):
     """Сериализатор для Токена.
     """
-    username = serializers.CharField()
-    confirmation_code = serializers.CharField()
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -95,9 +73,6 @@ class TitleGetSerializer(serializers.ModelSerializer):
 
 
 class TitlePostSerializer(serializers.ModelSerializer):
-    year = serializers.IntegerField(
-        validators=[MaxValueValidator(timezone.now().year)],
-    )
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(),
         slug_field='slug',
@@ -133,11 +108,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         default=serializers.CurrentUserDefault(),
     )
-    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Review
-        fields = ('id', 'text', 'author', 'score', 'pub_date', 'rating')
+        fields = ('id', 'text', 'author', 'score', 'pub_date',)
 
     def validate(self, data):
         if self.context['request'].method != 'POST':
