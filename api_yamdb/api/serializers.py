@@ -1,9 +1,8 @@
-from django.core.validators import MaxValueValidator
-from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
+from .validators import year_validator
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,17 +40,6 @@ class UserEditSerializer(serializers.ModelSerializer):
 class RegisterSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации.
     """
-    username = serializers.CharField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ]
-    )
-    email = serializers.EmailField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ]
-    )
-
     def validate_username(self, value):
         """ Username 'me' запрещен по ТЗ.
         """
@@ -96,7 +84,7 @@ class TitleGetSerializer(serializers.ModelSerializer):
 
 class TitlePostSerializer(serializers.ModelSerializer):
     year = serializers.IntegerField(
-        validators=[MaxValueValidator(timezone.now().year)],
+        validators=(year_validator,)
     )
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(),

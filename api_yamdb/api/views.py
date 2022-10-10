@@ -1,5 +1,6 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db import IntegrityError
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -30,10 +31,12 @@ def register(request):
     serializer = RegisterSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    user = get_object_or_404(
-        User,
-        username=serializer.validated_data['username']
-    )
+    try:
+        user, _ = User.objects.get_or_create(**serializer.validated_data)
+    except IntegrityError:
+        raise IntegrityError(
+            'Пользователь с таким username или email уже существует'
+        )
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         subject='Registration',
