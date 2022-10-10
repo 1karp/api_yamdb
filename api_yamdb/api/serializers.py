@@ -30,14 +30,10 @@ class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(
         validators=[
             validate_username,
-            UniqueValidator(queryset=User.objects.all())
         ],
         required=True
     )
     email = serializers.EmailField(
-        validators=[
-            UniqueValidator(queryset=User.objects.all())
-        ],
         required=True
     )
 
